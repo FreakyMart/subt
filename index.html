@@ -213,8 +213,23 @@
               <p class="text-xs text-gray-400 mt-0.5">التوقيت هنا مصفّر ويبدأ من 00:00:00 للريل</p>
             </div>
 
+          <!-- TOOLBAR: UNDO / REDO & TIME SHIFT -->
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-gray-950 p-2.5 rounded-xl border border-gray-800">
+            <!-- Undo & Redo Buttons -->
+            <div class="flex items-center gap-1.5">
+              <button class="action-undo-btn bg-gray-900 hover:bg-gray-800 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 active:scale-95 opacity-40 cursor-not-allowed" title="تراجع عن آخر تعديل (Ctrl+Z)" disabled>
+                <span>↩️</span> تراجع (Undo)
+              </button>
+              <button class="action-redo-btn bg-gray-900 hover:bg-gray-800 text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 active:scale-95 opacity-40 cursor-not-allowed" title="إعادة التعديل (Ctrl+Y)" disabled>
+                <span>↪️</span> تقديم (Redo)
+              </button>
+              <button id="restoreOriginalCaptionsBtn" class="bg-gray-900 hover:bg-gray-800 text-amber-400 border border-amber-500/30 px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 active:scale-95" title="استعادة الجمل الأصلية قبل أي تقسيم">
+                <span>🔄</span> استعادة الجمل الأصلية
+              </button>
+            </div>
+
             <!-- Global Time Shift for alignment -->
-            <div class="flex items-center gap-1 bg-gray-950 p-1 rounded-xl border border-gray-800 text-xs" dir="ltr">
+            <div class="flex items-center gap-1 text-xs" dir="ltr">
               <span class="text-[11px] text-gray-500 px-1">إزاحة عامة:</span>
               <button class="time-shift-btn bg-gray-900 hover:bg-gray-800 text-gray-300 px-2 py-1 rounded active:scale-95" data-shift="-0.5">-0.5s</button>
               <button class="time-shift-btn bg-gray-900 hover:bg-gray-800 text-gray-300 px-2 py-1 rounded active:scale-95" data-shift="-0.1">-0.1s</button>
@@ -223,29 +238,33 @@
             </div>
           </div>
 
-          <!-- REELS WORD SPLITTER (NEW PUNCHY REELS STYLE) -->
+          <!-- REELS WORD SPLITTER (NEW PUNCHY REELS STYLE - WITH SAFE ORIGINAL BACKUP) -->
           <div class="bg-gradient-to-r from-orange-950/40 via-gray-950 to-amber-950/30 p-3.5 rounded-xl border border-orange-500/40 flex flex-col gap-2.5">
             <div class="flex items-center justify-between">
               <div>
                 <span class="text-xs font-black text-orange-400 flex items-center gap-1.5">
-                  <span>⚡</span> تقسيم الجمل الطويلة لستايل الريلز السريع (كلمات قليلة):
+                  <span>⚡</span> تقسيم الجمل لستايل الريلز السريع (كلمات قليلة):
                 </span>
-                <p class="text-[11px] text-gray-400 mt-0.5">يقوم أوتوماتيكياً بتوزيع وقت الجملة بالتساوي ليظهر عدد قليل من الكلمات في كل لقطة</p>
+                <p class="text-[11px] text-gray-400 mt-0.5">يقسم من النص الأصلي بأمان دون تكرار التقسيم أو تشويه الكلمات</p>
               </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 text-xs">
-              <button class="split-words-btn bg-gray-900 hover:bg-orange-500/20 border border-gray-800 hover:border-orange-500/50 text-gray-200 py-2 px-2 rounded-lg font-bold transition flex flex-col items-center gap-0.5 active:scale-95" data-words="2">
-                <span class="text-orange-400 text-sm">⚡ كلمتين</span>
-                <span class="text-[10px] text-gray-500">سريع جداً وحماسي</span>
+            <div class="grid grid-cols-4 gap-2 text-xs">
+              <button class="split-words-btn bg-gray-900 hover:bg-amber-500/20 border border-gray-800 hover:border-amber-500/50 text-amber-300 py-2 px-1 rounded-lg font-bold transition flex flex-col items-center gap-0.5 active:scale-95" data-words="0">
+                <span class="text-xs">🔄 الأصلية</span>
+                <span class="text-[9px] text-gray-500">بدون تقسيم</span>
               </button>
-              <button class="split-words-btn bg-orange-500/20 border border-orange-500/50 text-orange-300 py-2 px-2 rounded-lg font-bold transition flex flex-col items-center gap-0.5 active:scale-95 shadow" data-words="3">
-                <span class="text-white text-sm">👌 3 كلمات</span>
-                <span class="text-[10px] text-orange-400 font-normal">الخيار الذهبي للريلز</span>
+              <button class="split-words-btn bg-gray-900 hover:bg-orange-500/20 border border-gray-800 hover:border-orange-500/50 text-gray-200 py-2 px-1 rounded-lg font-bold transition flex flex-col items-center gap-0.5 active:scale-95" data-words="2">
+                <span class="text-orange-400 text-xs">⚡ كلمتين</span>
+                <span class="text-[9px] text-gray-500">سريع وحماسي</span>
               </button>
-              <button class="split-words-btn bg-gray-900 hover:bg-orange-500/20 border border-gray-800 hover:border-orange-500/50 text-gray-200 py-2 px-2 rounded-lg font-bold transition flex flex-col items-center gap-0.5 active:scale-95" data-words="4">
-                <span class="text-gray-300 text-sm">📝 4 كلمات</span>
-                <span class="text-[10px] text-gray-500">متوازن ومريح</span>
+              <button class="split-words-btn bg-orange-500/20 border border-orange-500/50 text-orange-300 py-2 px-1 rounded-lg font-bold transition flex flex-col items-center gap-0.5 active:scale-95 shadow" data-words="3">
+                <span class="text-white text-xs">👌 3 كلمات</span>
+                <span class="text-[9px] text-orange-400 font-normal">الأفضل للريلز</span>
+              </button>
+              <button class="split-words-btn bg-gray-900 hover:bg-orange-500/20 border border-gray-800 hover:border-orange-500/50 text-gray-200 py-2 px-1 rounded-lg font-bold transition flex flex-col items-center gap-0.5 active:scale-95" data-words="4">
+                <span class="text-gray-300 text-xs">📝 4 كلمات</span>
+                <span class="text-[9px] text-gray-500">متوازن</span>
               </button>
             </div>
           </div>
@@ -588,6 +607,9 @@
       trimEndIndex: -1,         // Precise end index
       
       captions: [],             // Active trimmed & shifted captions for this reel [{ id, startSec, endSec, text }]
+      unsplitCaptions: [],      // Original unsplit captions preserved for safe re-splitting & reset
+      history: [],              // Stack of states for Undo/Redo
+      historyIdx: -1,
       
       // Styling & Positioning
       fontFamily: 'Cairo',
@@ -978,6 +1000,10 @@
         text: cue.text
       }));
 
+      // Store clean unsplit baseline copy & start history
+      appState.unsplitCaptions = JSON.parse(JSON.stringify(appState.captions));
+      resetHistory();
+
       renderCaptionsList();
       switchTab('captions');
       showToast(`تم اقتطاع ${appState.captions.length} سطر بدقة وتصفير التوقيت للريل!`, '🎉');
@@ -1028,6 +1054,9 @@
           appState.captions[idx].text = e.target.value;
           updateOverlayCaption(studioVideoPlayer.currentTime);
         });
+        input.addEventListener('change', () => {
+          saveHistoryState('تعديل نص');
+        });
       });
 
       captionsItemsContainer.querySelectorAll('.cue-start-input').forEach(input => {
@@ -1035,6 +1064,7 @@
           const idx = parseInt(e.target.dataset.idx, 10);
           appState.captions[idx].startSec = parseFloat(e.target.value) || 0;
           updateOverlayCaption(studioVideoPlayer.currentTime);
+          saveHistoryState('تعديل بداية');
         });
       });
 
@@ -1043,6 +1073,7 @@
           const idx = parseInt(e.target.dataset.idx, 10);
           appState.captions[idx].endSec = parseFloat(e.target.value) || 0;
           updateOverlayCaption(studioVideoPlayer.currentTime);
+          saveHistoryState('تعديل نهاية');
         });
       });
 
@@ -1053,6 +1084,7 @@
           appState.captions.forEach((c, i) => c.id = i + 1);
           renderCaptionsList();
           updateOverlayCaption(studioVideoPlayer.currentTime);
+          saveHistoryState('حذف سطر');
         });
       });
 
@@ -1078,6 +1110,7 @@
       appState.captions.sort((a, b) => a.startSec - b.startSec);
       appState.captions.forEach((c, i) => c.id = i + 1);
       renderCaptionsList();
+      saveHistoryState('إضافة سطر');
       showToast('تمت إضافة سطر جديد', '➕');
     });
 
@@ -1090,6 +1123,7 @@
         });
         renderCaptionsList();
         updateOverlayCaption(studioVideoPlayer.currentTime);
+        saveHistoryState('إزاحة توقيت');
         showToast(`تم إزاحة الكابشن: ${shift > 0 ? '+' : ''}${shift} ثانية`, '⏱️');
       });
     });
@@ -1246,18 +1280,139 @@
       updateOverlayStyles();
     });
 
-    // --- REELS WORD SPLITTER LOGIC (2-3 WORDS PUNCHY STYLE) ---
+    // --- UNDO / REDO & HISTORY ENGINE ---
+    function resetHistory() {
+      appState.history = [];
+      appState.historyIdx = -1;
+      saveHistoryState('البداية');
+    }
+
+    function saveHistoryState(actionLabel = '') {
+      if (!appState.captions) return;
+      const snapshot = JSON.stringify(appState.captions);
+
+      // If we are back in history, discard future redo branch
+      if (appState.historyIdx >= 0 && appState.historyIdx < appState.history.length - 1) {
+        appState.history = appState.history.slice(0, appState.historyIdx + 1);
+      }
+
+      // Avoid duplicate consecutive identical states
+      if (appState.history.length > 0 && appState.history[appState.history.length - 1] === snapshot) {
+        return;
+      }
+
+      appState.history.push(snapshot);
+      if (appState.history.length > 50) {
+        appState.history.shift();
+      }
+      appState.historyIdx = appState.history.length - 1;
+      updateUndoRedoButtons();
+    }
+
+    function undo() {
+      if (appState.historyIdx > 0) {
+        appState.historyIdx--;
+        appState.captions = JSON.parse(appState.history[appState.historyIdx]);
+        renderCaptionsList();
+        updateOverlayCaption(studioVideoPlayer.currentTime);
+        updateUndoRedoButtons();
+        showToast('تم التراجع ↩️', '↩️');
+      }
+    }
+
+    function redo() {
+      if (appState.historyIdx < appState.history.length - 1) {
+        appState.historyIdx++;
+        appState.captions = JSON.parse(appState.history[appState.historyIdx]);
+        renderCaptionsList();
+        updateOverlayCaption(studioVideoPlayer.currentTime);
+        updateUndoRedoButtons();
+        showToast('تمت الإعادة ↪️', '↪️');
+      }
+    }
+
+    function updateUndoRedoButtons() {
+      const canUndo = appState.historyIdx > 0;
+      const canRedo = appState.historyIdx < appState.history.length - 1;
+
+      document.querySelectorAll('.action-undo-btn').forEach(btn => {
+        btn.disabled = !canUndo;
+        btn.classList.toggle('opacity-40', !canUndo);
+        btn.classList.toggle('cursor-not-allowed', !canUndo);
+      });
+
+      document.querySelectorAll('.action-redo-btn').forEach(btn => {
+        btn.disabled = !canRedo;
+        btn.classList.toggle('opacity-40', !canRedo);
+        btn.classList.toggle('cursor-not-allowed', !canRedo);
+      });
+    }
+
+    // Attach Undo / Redo Click listeners
+    document.querySelectorAll('.action-undo-btn').forEach(b => b.addEventListener('click', undo));
+    document.querySelectorAll('.action-redo-btn').forEach(b => b.addEventListener('click', redo));
+
+    // Keyboard Shortcuts (Ctrl+Z / Cmd+Z for iPad Magic Keyboard)
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        redo();
+      }
+    });
+
+    // Restore Original Captions Button
+    const restoreOriginalCaptionsBtn = document.getElementById('restoreOriginalCaptionsBtn');
+    if (restoreOriginalCaptionsBtn) {
+      restoreOriginalCaptionsBtn.addEventListener('click', () => {
+        if (!appState.unsplitCaptions || appState.unsplitCaptions.length === 0) {
+          showToast('لم يتم حفظ أي جمل أصلية بعد', '⚠️');
+          return;
+        }
+        appState.captions = JSON.parse(JSON.stringify(appState.unsplitCaptions));
+        renderCaptionsList();
+        updateOverlayCaption(studioVideoPlayer.currentTime);
+        saveHistoryState('استعادة الجمل الأصلية');
+        showToast('تمت استعادة الجمل الأصلية كاملة بنجاح! 🔄', '✨');
+      });
+    }
+
+    // --- REELS WORD SPLITTER LOGIC (SAFE RE-SPLIT FROM ORIGINAL) ---
     document.querySelectorAll('.split-words-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        if (appState.captions.length === 0) {
-          showToast('لا توجد أسطر كابشن لتقسيمها', '⚠️');
+        const targetWords = parseInt(btn.dataset.words, 10);
+
+        // Ensure unsplitCaptions backup exists
+        if (!appState.unsplitCaptions || appState.unsplitCaptions.length === 0) {
+          if (appState.captions && appState.captions.length > 0) {
+            appState.unsplitCaptions = JSON.parse(JSON.stringify(appState.captions));
+          } else {
+            showToast('لا توجد أسطر كابشن لتقسيمها', '⚠️');
+            return;
+          }
+        }
+
+        // If target is 0 -> Restore original unsplit!
+        if (targetWords === 0) {
+          appState.captions = JSON.parse(JSON.stringify(appState.unsplitCaptions));
+          renderCaptionsList();
+          updateOverlayCaption(studioVideoPlayer.currentTime);
+          saveHistoryState('استعادة الجمل الأصلية');
+          showToast('تمت استعادة الجمل الأصلية بدون تقسيم 🔄', '✨');
           return;
         }
 
-        const targetWords = parseInt(btn.dataset.words, 10);
+        // ALWAYS split from the original unsplitCaptions to prevent multiple-click distortion!
+        const sourceCaptions = appState.unsplitCaptions;
         const newCues = [];
 
-        appState.captions.forEach(cue => {
+        sourceCaptions.forEach(cue => {
           const rawWords = cue.text.trim().split(/\s+/).filter(w => w.length > 0);
           if (rawWords.length <= targetWords) {
             newCues.push({ ...cue, id: newCues.length + 1 });
@@ -1285,6 +1440,7 @@
         appState.captions = newCues;
         renderCaptionsList();
         updateOverlayCaption(studioVideoPlayer.currentTime);
+        saveHistoryState(`تقسيم الكلمات (${targetWords})`);
         showToast(`تم تقسيم الكابشن إلى (${targetWords} كلمات كحد أقصى) بنجاح!`, '⚡');
       });
     });
