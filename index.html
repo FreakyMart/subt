@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ReelCaption Studio | دمج وطباعة الكابشن على الفيديو</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;700;900&family=Almarai:wght@400;700;800&family=Bebas+Neue&family=Cairo:wght@400;700;900&family=Changa:wght@600;800&family=Montserrat:wght@700;900&family=Poppins:wght@700;900&family=Rubik:wght@600;800&family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#f97316',
+              600: '#ea580c'
+            }
+          },
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            alexandria: ['Alexandria', 'sans-serif'],
+            tajawal: ['Tajawal', 'sans-serif'],
+            almarai: ['Almarai', 'sans-serif'],
+            changa: ['Changa', 'sans-serif'],
+            rubik: ['Rubik', 'sans-serif'],
+            montserrat: ['Montserrat', 'sans-serif'],
+            bebas: ['Bebas Neue', 'cursive'],
+            poppins: ['Poppins', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #111827; }
+    ::-webkit-scrollbar-thumb { background: #374151; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+    
+    .phone-aspect {
+      aspect-ratio: 9 / 16;
+    }
+
+    .caption-overlay-text {
+      text-shadow: 
+        -3px -3px 0 var(--stroke-color, #000),  
+         3px -3px 0 var(--stroke-color, #000),
+        -3px  3px 0 var(--stroke-color, #000),
+         3px  3px 0 var(--stroke-color, #000),
+         0px  4px 10px rgba(0,0,0,0.9);
+      word-break: break-word;
+      user-select: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen font-cairo antialiased selection:bg-orange-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-orange-500/20">
+          🎬
+        </div>
+        <div>
+          <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
+            ReelCaption Studio
+            <span class="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full border border-orange-500/30">آيباد & ريلز</span>
+          </h1>
+          <p class="text-xs text-gray-400">ارفع الفيديو والنص، اختر الستايل، وحمّل الفيديو بالكابشن فوراً</p>
+        </div>
+      </div>
+
+      <!-- Quick Demo -->
+      <div class="flex items-center gap-2">
+        <button id="loadDemoBtn" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-lg border border-gray-700 transition flex items-center gap-1.5 active:scale-95">
+          <span>⚡ تجربة بنص تجريبي</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Studio Layout -->
+  <main class="max-w-7xl mx-auto p-3 sm:p-5 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT COLUMN: CONTROLS & CAPTIONS EDITOR (7-8 cols) -->
+    <div class="lg:col-span-7 xl:col-span-8 flex flex-col gap-4">
+
+      <!-- STEP 1 & 2: UPLOAD BAR (VIDEO & SRT) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        
+        <!-- Video Input Card -->
+        <div id="videoUploadCard" class="bg-gray-900 border-2 border-dashed border-gray-700 hover:border-orange-500/60 rounded-2xl p-4 transition relative flex flex-col items-center justify-center text-center group cursor-pointer">
+          <input type="file" id="videoFileInput" accept="video/mp4,video/quicktime,video/webm,video/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+          <div class="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </div>
+          <span class="text-sm font-bold text-gray-200 group-hover:text-white" id="videoInputTitle">1. اختر فيديو الريل من الآيباد</span>
+          <span class="text-xs text-gray-500 mt-0.5" id="videoInputSubtitle">اضغط لاختيار فيديو من الصور أو الملفات</span>
+        </div>
+
+        <!-- SRT / Text Input Card -->
+        <div id="srtUploadCard" class="bg-gray-900 border-2 border-dashed border-gray-700 hover:border-orange-500/60 rounded-2xl p-4 transition relative flex flex-col items-center justify-center text-center group cursor-pointer">
+          <input type="file" id="srtFileInput" accept=".srt,.vtt,.txt" class="absolute inset-0 opacity-0 cursor-pointer z-10">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <span class="text-sm font-bold text-gray-200 group-hover:text-white" id="srtInputTitle">2. اختر ملف الـ SRT أو النص</span>
+          <span class="text-xs text-gray-500 mt-0.5" id="srtInputSubtitle">ملف الترجمة الخاص بالمقطع أو البودكاست</span>
+        </div>
+
+      </div>
+
+      <!-- Quick Paste Modal Trigger / Alternative -->
+      <div class="flex items-center justify-between bg-gray-900/60 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-gray-400">
+        <span>أو يمكنك لصق النص والـ SRT يدوياً بدلاً من رفع ملف:</span>
+        <button id="togglePasteBoxBtn" class="text-orange-400 hover:underline font-semibold">
+          فتح خانة اللصق ✍️
+        </button>
+      </div>
+
+      <div id="pasteBoxContainer" class="hidden bg-gray-900 border border-gray-800 rounded-2xl p-4 flex flex-col gap-2">
+        <textarea id="directPasteArea" placeholder="الصق محتوى الـ SRT هنا..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 text-xs font-mono text-gray-300 focus:outline-none focus:border-orange-500 h-28 resize-none"></textarea>
+        <button id="applyPastedTextBtn" class="self-end bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition active:scale-95">
+          تطبيق النص على الفيديو
+        </button>
+      </div>
+
+      <!-- MAIN TABS: 1. أسطر الكابشن والتوقيت | 2. الخطوط والستايل | 3. قص البودكاست (لو الملف كامل) -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-sm">
+        
+        <!-- Tab Headers -->
+        <div class="flex border-b border-gray-800 bg-gray-950 text-xs sm:text-sm font-bold">
+          <button id="tabBtnCaptions" class="flex-1 py-3 px-3 text-center border-b-2 border-orange-500 text-orange-400 bg-gray-900/60 transition flex items-center justify-center gap-1.5">
+            <span>📝</span> أسطر وتوقيت الكابشن
+          </button>
+          <button id="tabBtnStyles" class="flex-1 py-3 px-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition flex items-center justify-center gap-1.5">
+            <span>🎨</span> الخطوط والألوان
+          </button>
+          <button id="tabBtnPodcastTrim" class="flex-1 py-3 px-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition flex items-center justify-center gap-1.5">
+            <span>✂️</span> تحديد مقطع البودكاست
+          </button>
+        </div>
+
+        <!-- TAB 1: CAPTIONS LIST & TIME EDITING -->
+        <div id="tabPanelCaptions" class="p-4 flex flex-col gap-3">
+          
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                <span>✍️</span> مراجعة وتعديل الكابشن المتزامن
+              </h3>
+              <p class="text-xs text-gray-400 mt-0.5">عدل أي كلمة أو اضبط وقت ظهورها مع صوت الفيديو</p>
+            </div>
+
+            <!-- Global Time Shift for alignment -->
+            <div class="flex items-center gap-1 bg-gray-950 p-1 rounded-xl border border-gray-800 text-xs" dir="ltr">
+              <span class="text-[11px] text-gray-500 px-1">تزامن عام:</span>
+              <button class="time-shift-btn bg-gray-900 hover:bg-gray-800 text-gray-300 px-2 py-1 rounded" data-shift="-0.5">-0.5s</button>
+              <button class="time-shift-btn bg-gray-900 hover:bg-gray-800 text-gray-300 px-2 py-1 rounded" data-shift="-0.1">-0.1s</button>
+              <button class="time-shift-btn bg-gray-900 hover:bg-gray-800 text-gray-300 px-2 py-1 rounded" data-shift="0.1">+0.1s</button>
+              <button class="time-shift-btn bg-gray-900 hover:bg-gray-800 text-gray-300 px-2 py-1 rounded" data-shift="0.5">+0.5s</button>
+            </div>
+          </div>
+
+          <!-- Add Line & Auto-sync Buttons -->
+          <div class="flex items-center justify-between pt-2">
+            <button id="addNewCaptionLineBtn" class="text-xs bg-orange-500/10 text-orange-400 border border-orange-500/30 hover:bg-orange-500 hover:text-white px-3 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5 active:scale-95">
+              <span>➕ إضافة سطر جديد عند مؤشر الفيديو</span>
+            </button>
+            <span id="captionCountBadge" class="text-xs text-gray-400 font-mono">0 أسطر</span>
+          </div>
+
+          <!-- Subtitle Items List -->
+          <div id="captionsItemsContainer" class="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
+            <div class="text-center py-10 text-gray-500 text-xs">
+              لم يتم تحميل أي كابشن بعد. ارفع ملف SRT أو اضغط "تجربة بنص تجريبي" بالأعلى.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 2: STYLES, FONTS & APPEARANCE -->
+        <div id="tabPanelStyles" class="hidden p-4 sm:p-5 flex flex-col gap-5">
+          
+          <!-- Fonts Section -->
+          <div>
+            <label class="text-xs font-bold text-gray-300 block mb-2">اختر الخط الملائم للريل:</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              <button class="font-select-btn border-2 border-orange-500 bg-orange-500/10 text-orange-300 p-2.5 rounded-xl text-center transition" data-font="Cairo">
+                <span class="block text-sm font-bold font-cairo">كايرو (Cairo)</span>
+                <span class="text-[10px] text-gray-400">الأكثر شهرة بالريلز</span>
+              </button>
+              <button class="font-select-btn border border-gray-800 bg-gray-950 text-gray-300 p-2.5 rounded-xl text-center transition hover:border-gray-700" data-font="Alexandria">
+                <span class="block text-sm font-bold font-alexandria">الإسكندرية</span>
+                <span class="text-[10px] text-gray-400">فخم وعصري جداً</span>
+              </button>
+              <button class="font-select-btn border border-gray-800 bg-gray-950 text-gray-300 p-2.5 rounded-xl text-center transition hover:border-gray-700" data-font="Tajawal">
+                <span class="block text-sm font-bold font-tajawal">تجوال (Tajawal)</span>
+                <span class="text-[10px] text-gray-400">أنيق وسلس</span>
+              </button>
+              <button class="font-select-btn border border-gray-800 bg-gray-950 text-gray-300 p-2.5 rounded-xl text-center transition hover:border-gray-700" data-font="Changa">
+                <span class="block text-sm font-bold font-changa">تشانغا (Changa)</span>
+                <span class="text-[10px] text-gray-400">عريض وحماسي</span>
+              </button>
+              <button class="font-select-btn border border-gray-800 bg-gray-950 text-gray-300 p-2.5 rounded-xl text-center transition hover:border-gray-700" data-font="Montserrat">
+                <span class="block text-sm font-black font-montserrat">Montserrat</span>
+                <span class="text-[10px] text-gray-400">Heavy English</span>
+              </button>
+              <button class="font-select-btn border border-gray-800 bg-gray-950 text-gray-300 p-2.5 rounded-xl text-center transition hover:border-gray-700" data-font="Bebas Neue">
+                <span class="block text-sm font-bold font-bebas tracking-wide">BEBAS NEUE</span>
+                <span class="text-[10px] text-gray-400">Viral Tall</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Styles Presets -->
+          <div>
+            <label class="text-xs font-bold text-gray-300 block mb-2">أنماط ألوان الكابشن الشهيرة:</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button class="color-preset-btn p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-yellow-400 text-center transition flex flex-col items-center"
+                      data-color="#FFE600" data-stroke="#000000">
+                <span class="font-black text-sm text-yellow-400 drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">أصفر تيك توك</span>
+                <span class="text-[10px] text-gray-500">TikTok Yellow</span>
+              </button>
+              <button class="color-preset-btn p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-white text-center transition flex flex-col items-center"
+                      data-color="#FFFFFF" data-stroke="#000000">
+                <span class="font-black text-sm text-white drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">أبيض نقي</span>
+                <span class="text-[10px] text-gray-500">Clean White</span>
+              </button>
+              <button class="color-preset-btn p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-green-400 text-center transition flex flex-col items-center"
+                      data-color="#22C55E" data-stroke="#000000">
+                <span class="font-black text-sm text-green-400 drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">أخضر هورموزي</span>
+                <span class="text-[10px] text-gray-500">Hormozi Green</span>
+              </button>
+              <button class="color-preset-btn p-2 rounded-xl bg-gray-950 border border-gray-800 hover:border-cyan-400 text-center transition flex flex-col items-center"
+                      data-color="#06B6D4" data-stroke="#000000">
+                <span class="font-black text-sm text-cyan-400 drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">أزرق نيون</span>
+                <span class="text-[10px] text-gray-500">Cyber Cyan</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Fine Adjustments -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-gray-800/80">
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">لون الخط:</label>
+              <div class="flex items-center gap-2 bg-gray-950 p-2 rounded-xl border border-gray-800">
+                <input type="color" id="textColorPicker" value="#FFE600" class="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0">
+                <span id="textColorHex" class="font-mono text-xs text-gray-300" dir="ltr">#FFE600</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">لون الحدود (Stroke):</label>
+              <div class="flex items-center gap-2 bg-gray-950 p-2 rounded-xl border border-gray-800">
+                <input type="color" id="strokeColorPicker" value="#000000" class="w-8 h-8 rounded-lg cursor-pointer bg-transparent border-0">
+                <span id="strokeColorHex" class="font-mono text-xs text-gray-300" dir="ltr">#000000</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs text-gray-400">حجم الخط:</label>
+                <span id="fontSizeDisplay" class="text-xs text-orange-400 font-mono">32px</span>
+              </div>
+              <input type="range" id="fontSizeSlider" min="20" max="64" value="32" class="w-full accent-orange-500">
+            </div>
+          </div>
+
+          <!-- Position & Background Box -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div>
+              <label class="text-xs text-gray-400 block mb-1.5">موقع الكابشن على الفيديو:</label>
+              <div class="flex bg-gray-950 p-1 rounded-xl border border-gray-800 text-xs">
+                <button class="position-btn flex-1 py-1.5 rounded-lg text-gray-400" data-pos="top">أعلى</button>
+                <button class="position-btn flex-1 py-1.5 rounded-lg text-gray-400" data-pos="center">وسط</button>
+                <button class="position-btn flex-1 py-1.5 rounded-lg bg-orange-500 text-white font-bold" data-pos="bottom">أسفل (معتاد)</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs text-gray-400 block mb-1.5">شريط خلفية تظليل:</label>
+              <div class="flex items-center gap-3 bg-gray-950 p-2 rounded-xl border border-gray-800">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="bgBoxToggle" class="sr-only peer">
+                  <div class="w-9 h-5 bg-gray-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+                </label>
+                <span class="text-xs text-gray-300">خلفية مظللة وراء الكلمات</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB 3: PODCAST TRIMMER (FOR FULL PODCAST SRTs) -->
+        <div id="tabPanelPodcastTrim" class="hidden p-4 flex flex-col gap-3">
+          <div class="bg-gray-950 p-3 rounded-xl border border-gray-800 text-xs text-gray-300">
+            💡 إذا كان ملف الـ SRT يحتوي على البودكاست كاملاً (ساعة مثلاً)، ابحث هنا عن أول سطر يبدأ به الريل، واضغط <b>"تثبيت كبداية"</b> ليتم تصفير وقت كل الأسطر مع الفيديو تلقائياً!
+          </div>
+
+          <div class="flex items-center gap-2">
+            <input type="text" id="searchPodcastText" placeholder="ابحث عن كلمة في البودكاست الكامل..." class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-orange-500">
+          </div>
+
+          <div id="rawPodcastList" class="max-h-72 overflow-y-auto space-y-2 pr-1">
+            <div class="text-center py-6 text-gray-500 text-xs">
+              ارفع ملف الـ SRT للبودكاست أولاً لتصفح الأسطر هنا.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: 9:16 LIVE VIDEO PREVIEW & EXPORT (4-5 cols) -->
+    <div class="lg:col-span-5 xl:col-span-4 flex flex-col gap-4">
+
+      <div class="bg-gray-900 border border-gray-800 rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col items-center sticky top-20">
+        
+        <div class="w-full flex items-center justify-between mb-3 text-xs px-1">
+          <span class="font-bold flex items-center gap-1.5 text-white">
+            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+            معاينة الفيديو والكابشن الحية
+          </span>
+          <span id="videoDurationText" class="font-mono text-gray-400" dir="ltr">00:00 / 00:00</span>
+        </div>
+
+        <!-- 9:16 Phone Canvas Mockup -->
+        <div class="relative w-full max-w-[280px] sm:max-w-[300px] phone-aspect bg-black rounded-[36px] border-4 border-gray-800 shadow-2xl overflow-hidden flex flex-col justify-between p-3 select-none">
+          
+          <!-- Notch -->
+          <div class="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-4 bg-gray-900 rounded-full z-30 flex items-center justify-center">
+            <div class="w-3 h-3 rounded-full bg-gray-950 mr-2"></div>
+            <div class="w-8 h-1 bg-gray-800 rounded-full"></div>
+          </div>
+
+          <!-- Video Element (Plays in preview) -->
+          <video id="studioVideoPlayer" class="absolute inset-0 w-full h-full object-cover z-0 hidden" playsinline webkit-playsinline></video>
+          
+          <!-- Placeholder when no video is loaded -->
+          <div id="noVideoPlaceholder" class="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-950 to-black flex flex-col items-center justify-center text-center p-4 z-0">
+            <div class="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-2xl mb-2 text-orange-400">
+              📹
+            </div>
+            <span class="text-xs font-bold text-gray-300">ارفع فيديو الريل</span>
+            <span class="text-[11px] text-gray-500 mt-1">سيتم تشغيله ومطابقة الكابشن عليه فوراً</span>
+          </div>
+
+          <!-- CAPTION OVERLAY LAYER (Dynamic Live Positioning) -->
+          <div id="captionOverlayWrapper" class="absolute inset-x-0 bottom-14 z-20 px-3 flex justify-center pointer-events-none transition-all">
+            <div id="captionOverlayText" class="caption-overlay-text text-center font-bold px-3 py-1 rounded-lg text-yellow-400 font-cairo text-2xl leading-snug" style="--stroke-color: #000000;">
+              <!-- Dynamic Caption Line Appears Here -->
+            </div>
+          </div>
+
+          <!-- TOP STATUS -->
+          <div class="z-20 mt-6 flex justify-between items-center text-[10px] text-white/70 px-2">
+            <span>Reels Studio</span>
+            <span id="currentTimeDisplay" class="font-mono bg-black/50 px-2 py-0.5 rounded text-white font-bold" dir="ltr">00:00.0</span>
+          </div>
+
+          <!-- BOTTOM CONTROLS & TIMELINE -->
+          <div class="z-20 w-full flex flex-col gap-1.5 pb-1">
+            <input type="range" id="videoTimelineSlider" min="0" max="100" value="0" step="0.05" class="w-full accent-orange-500 h-1.5 bg-white/30 rounded-lg cursor-pointer">
+            <div class="flex items-center justify-between text-xs text-white">
+              <button id="togglePlayBtn" class="bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur transition active:scale-95">
+                <svg id="playIconSvg" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="pauseIconSvg" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              </button>
+              
+              <div class="flex items-center gap-2">
+                <button id="jumpBackSecBtn" class="text-[11px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded" title="تراجع 3 ثواني">-3s</button>
+                <button id="jumpForwardSecBtn" class="text-[11px] bg-white/10 hover:bg-white/20 px-2 py-1 rounded" title="تقديم 3 ثواني">+3s</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- EXPORT VIDEO BUTTON & PROGRESS -->
+        <div class="w-full mt-5 flex flex-col gap-3">
+          
+          <!-- Big Export Button -->
+          <button id="exportFinalVideoBtn" class="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-xl shadow-orange-500/25 flex items-center justify-center gap-2 transition active:scale-[0.98] text-base">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>🚀 تصدير وحفظ الفيديو بالكابشن</span>
+          </button>
+
+          <!-- Export Progress Bar (Hidden initially) -->
+          <div id="exportProgressBarContainer" class="hidden flex flex-col gap-1 bg-gray-950 p-3 rounded-xl border border-gray-800">
+            <div class="flex justify-between text-xs font-semibold">
+              <span class="text-orange-400">جاري طباعة الكابشن وتوليد الفيديو...</span>
+              <span id="exportPercentageText" class="font-mono text-white">0%</span>
+            </div>
+            <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+              <div id="exportProgressBar" class="bg-orange-500 h-full w-0 transition-all duration-150"></div>
+            </div>
+            <span class="text-[10px] text-gray-500 text-center">يرجى عدم إغلاق الصفحة أثناء المعالجة</span>
+          </div>
+
+          <!-- Secondary Format: Download Shifted SRT -->
+          <div class="grid grid-cols-2 gap-2">
+            <button id="downloadShiftedSrtBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition">
+              <span>📄 حفظ كملف SRT</span>
+            </button>
+            <button id="copyCaptionsTextBtn" class="bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 font-semibold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition">
+              <span>📋 نسخ النصوص</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Hidden Offscreen Canvas for Video Rendering & Export -->
+  <canvas id="renderExportCanvas" class="hidden"></canvas>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-900 border border-orange-500 text-white px-4 py-2.5 rounded-xl text-xs shadow-2xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+    <span id="toastIcon">✅</span>
+    <span id="toastMessage">تم بنجاح</span>
+  </div>
+
+  <!-- APPLICATION JAVASCRIPT LOGIC -->
+  <script>
+    // --- Application State ---
+    const appState = {
+      videoSrc: null,
+      videoFile: null,
+      videoDuration: 0,
+      
+      rawPodcastCues: [],       // Raw cues from full podcast
+      captions: [],             // Active captions for this video [{ id, startSec, endSec, text }]
+      
+      // Styling
+      fontFamily: 'Cairo',
+      textColor: '#FFE600',
+      strokeColor: '#000000',
+      fontSize: 32,
+      position: 'bottom',       // 'top', 'center', 'bottom'
+      hasBackgroundBox: false,
+
+      // Export state
+      isExporting: false
+    };
+
+    // --- DOM Elements ---
+    const videoFileInput = document.getElementById('videoFileInput');
+    const srtFileInput = document.getElementById('srtFileInput');
+    const videoInputTitle = document.getElementById('videoInputTitle');
+    const videoInputSubtitle = document.getElementById('videoInputSubtitle');
+    const srtInputTitle = document.getElementById('srtInputTitle');
+    const srtInputSubtitle = document.getElementById('srtInputSubtitle');
+
+    const togglePasteBoxBtn = document.getElementById('togglePasteBoxBtn');
+    const pasteBoxContainer = document.getElementById('pasteBoxContainer');
+    const directPasteArea = document.getElementById('directPasteArea');
+    const applyPastedTextBtn = document.getElementById('applyPastedTextBtn');
+
+    // Studio Video Player & Mockup
+    const studioVideoPlayer = document.getElementById('studioVideoPlayer');
+    const noVideoPlaceholder = document.getElementById('noVideoPlaceholder');
+    const captionOverlayWrapper = document.getElementById('captionOverlayWrapper');
+    const captionOverlayText = document.getElementById('captionOverlayText');
+    const videoTimelineSlider = document.getElementById('videoTimelineSlider');
+    const togglePlayBtn = document.getElementById('togglePlayBtn');
+    const playIconSvg = document.getElementById('playIconSvg');
+    const pauseIconSvg = document.getElementById('pauseIconSvg');
+    const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+    const videoDurationText = document.getElementById('videoDurationText');
+    const jumpBackSecBtn = document.getElementById('jumpBackSecBtn');
+    const jumpForwardSecBtn = document.getElementById('jumpForwardSecBtn');
+
+    // Tabs
+    const tabBtnCaptions = document.getElementById('tabBtnCaptions');
+    const tabBtnStyles = document.getElementById('tabBtnStyles');
+    const tabBtnPodcastTrim = document.getElementById('tabBtnPodcastTrim');
+    const tabPanelCaptions = document.getElementById('tabPanelCaptions');
+    const tabPanelStyles = document.getElementById('tabPanelStyles');
+    const tabPanelPodcastTrim = document.getElementById('tabPanelPodcastTrim');
+
+    const captionsItemsContainer = document.getElementById('captionsItemsContainer');
+    const captionCountBadge = document.getElementById('captionCountBadge');
+    const addNewCaptionLineBtn = document.getElementById('addNewCaptionLineBtn');
+    const rawPodcastList = document.getElementById('rawPodcastList');
+    const searchPodcastText = document.getElementById('searchPodcastText');
+
+    // Style Controls
+    const textColorPicker = document.getElementById('textColorPicker');
+    const textColorHex = document.getElementById('textColorHex');
+    const strokeColorPicker = document.getElementById('strokeColorPicker');
+    const strokeColorHex = document.getElementById('strokeColorHex');
+    const fontSizeSlider = document.getElementById('fontSizeSlider');
+    const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+    const bgBoxToggle = document.getElementById('bgBoxToggle');
+
+    // Export Controls
+    const exportFinalVideoBtn = document.getElementById('exportFinalVideoBtn');
+    const exportProgressBarContainer = document.getElementById('exportProgressBarContainer');
+    const exportProgressBar = document.getElementById('exportProgressBar');
+    const exportPercentageText = document.getElementById('exportPercentageText');
+    const downloadShiftedSrtBtn = document.getElementById('downloadShiftedSrtBtn');
+    const copyCaptionsTextBtn = document.getElementById('copyCaptionsTextBtn');
+    const renderExportCanvas = document.getElementById('renderExportCanvas');
+    const loadDemoBtn = document.getElementById('loadDemoBtn');
+
+    // --- Helpers: Time Formatting ---
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) seconds = 0;
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      const ms = Math.floor((seconds % 1) * 1000);
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(ms).padStart(3, '0').slice(0, 2)}`;
+    }
+
+    function timeStrToSeconds(timeStr) {
+      if (!timeStr) return 0;
+      const clean = timeStr.trim().replace('.', ',');
+      const parts = clean.split(':');
+      if (parts.length === 3) {
+        const h = parseFloat(parts[0]) || 0;
+        const m = parseFloat(parts[1]) || 0;
+        const [s, ms] = parts[2].split(',');
+        return (h * 3600) + (m * 60) + (parseFloat(s) || 0) + ((parseFloat(ms) || 0) / 1000);
+      } else if (parts.length === 2) {
+        const m = parseFloat(parts[0]) || 0;
+        const [s, ms] = parts[1].split(',');
+        return (m * 60) + (parseFloat(s) || 0) + ((parseFloat(ms) || 0) / 1000);
+      }
+      return parseFloat(timeStr) || 0;
+    }
+
+    function secondsToSrtTime(totalSec) {
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = Math.floor(totalSec % 60);
+      const ms = Math.floor((totalSec % 1) * 1000);
+      const pad = (n, len = 2) => String(n).padStart(len, '0');
+      return `${pad(h)}:${pad(m)}:${pad(s)},${pad(ms, 3)}`;
+    }
+
+    // --- Video Input Handling ---
+    videoFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      appState.videoFile = file;
+      appState.videoSrc = URL.createObjectURL(file);
+      studioVideoPlayer.src = appState.videoSrc;
+      studioVideoPlayer.classList.remove('hidden');
+      noVideoPlaceholder.classList.add('hidden');
+
+      videoInputTitle.textContent = `✓ تم تحميل: ${file.name}`;
+      videoInputSubtitle.textContent = `${(file.size / (1024 * 1024)).toFixed(1)} MB - جاهز للمزامنة`;
+
+      studioVideoPlayer.onloadedmetadata = () => {
+        appState.videoDuration = studioVideoPlayer.duration;
+        videoTimelineSlider.max = appState.videoDuration;
+        videoDurationText.textContent = `00:00 / ${formatTime(appState.videoDuration)}`;
+        showToast('تم تحميل الفيديو بنجاح!', '🎬');
+      };
+    });
+
+    // --- SRT Parsing Logic ---
+    function parseSRT(text) {
+      if (!text) return [];
+      const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+      const blocks = normalized.split(/\n\s*\n/);
+      const cues = [];
+
+      blocks.forEach((block) => {
+        const lines = block.trim().split('\n');
+        if (lines.length < 2) return;
+
+        let timeIdx = 0;
+        if (!lines[0].includes('-->') && lines.length > 1 && lines[1].includes('-->')) {
+          timeIdx = 1;
+        }
+
+        const match = lines[timeIdx].match(/((?:\d+:)?\d+:\d+[,.]\d+)\s*-->\s*((?:\d+:)?\d+:\d+[,.]\d+)/);
+        if (match) {
+          const startSec = timeStrToSeconds(match[1]);
+          const endSec = timeStrToSeconds(match[2]);
+          const cueText = lines.slice(timeIdx + 1).join('\n').trim();
+
+          if (cueText) {
+            cues.push({
+              id: cues.length + 1,
+              startSec,
+              endSec,
+              text: cueText
+            });
+          }
+        }
+      });
+      return cues;
+    }
+
+    function loadSRTText(text) {
+      const cues = parseSRT(text);
+      if (!cues || cues.length === 0) {
+        showToast('تعذر قراءة ملف الـ SRT، تأكد من التنسيق', '⚠️');
+        return;
+      }
+
+      appState.rawPodcastCues = cues;
+
+      // Determine if this SRT needs shifting (starts at minute > 1 e.g.)
+      const firstStart = cues[0].startSec;
+      if (firstStart > 5) {
+        // Full podcast file! Shift relative to first cue by default
+        appState.captions = cues.map((c, i) => ({
+          id: i + 1,
+          startSec: Math.max(0, c.startSec - firstStart),
+          endSec: Math.max(0, c.endSec - firstStart),
+          text: c.text
+        }));
+        renderRawPodcastList();
+        showToast(`تم استيراد ${cues.length} أسطر وتصفير التوقيت للريل!`, '✨');
+      } else {
+        // Already reel captions
+        appState.captions = cues.map((c, i) => ({
+          id: i + 1,
+          startSec: c.startSec,
+          endSec: c.endSec,
+          text: c.text
+        }));
+        showToast(`تم استيراد ${cues.length} أسطر كابشن!`, '✅');
+      }
+
+      renderCaptionsList();
+      srtInputTitle.textContent = `✓ تم تحميل ${cues.length} سطر كابشن`;
+      srtInputSubtitle.textContent = 'يمكنك تعديل أي كلمة أو وقت بالأسفل';
+    }
+
+    srtFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        loadSRTText(ev.target.result);
+      };
+      reader.readAsText(file);
+    });
+
+    // Paste Box Toggle & Handlers
+    togglePasteBoxBtn.addEventListener('click', () => {
+      pasteBoxContainer.classList.toggle('hidden');
+    });
+
+    applyPastedTextBtn.addEventListener('click', () => {
+      const txt = directPasteArea.value.trim();
+      if (txt) {
+        loadSRTText(txt);
+        pasteBoxContainer.classList.add('hidden');
+      }
+    });
+
+    // Demo Data
+    loadDemoBtn.addEventListener('click', () => {
+      const demo = `1
+00:00:00,200 --> 00:00:02,600
+أهلاً بكم في هذا الريل السريع والمميز
+
+2
+00:00:02,800 --> 00:00:05,400
+تقدر تضيف الكابشن على أي فيديو مباشرة
+
+3
+00:00:05,600 --> 00:00:08,800
+وتختار ألوان وخطوط تيك توك الشهيرة بضغطة زر واحدة
+
+4
+00:00:09,000 --> 00:00:12,200
+وتحمل الفيديو النهائي مطبوع وجاهز للإنستغرام!`;
+
+      loadSRTText(demo);
+    });
+
+    // --- Render Editable Captions List ---
+    function renderCaptionsList() {
+      captionsItemsContainer.innerHTML = '';
+      captionCountBadge.textContent = `${appState.captions.length} أسطر`;
+
+      if (appState.captions.length === 0) {
+        captionsItemsContainer.innerHTML = `
+          <div class="text-center py-8 text-gray-500 text-xs">
+            لا توجد أسطر كابشن. ارفع ملف SRT أو اضغط إضافة سطر جديد.
+          </div>
+        `;
+        return;
+      }
+
+      appState.captions.forEach((cue, idx) => {
+        const card = document.createElement('div');
+        card.className = 'bg-gray-950 p-2.5 rounded-xl border border-gray-800 flex flex-col gap-1.5 transition hover:border-gray-700';
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono font-bold text-orange-400 bg-orange-400/10 px-1.5 py-0.5 rounded text-[11px]">#${cue.id}</span>
+              <button class="jump-to-cue-btn text-gray-400 hover:text-white text-[11px] underline" data-time="${cue.startSec}">▶ انتقال للتوقيت</button>
+            </div>
+            <div class="flex items-center gap-1" dir="ltr">
+              <input type="number" step="0.1" class="cue-start-input w-16 bg-gray-900 border border-gray-800 rounded px-1.5 py-0.5 text-center text-gray-200 text-xs" value="${cue.startSec.toFixed(2)}" data-idx="${idx}">
+              <span class="text-gray-500">➔</span>
+              <input type="number" step="0.1" class="cue-end-input w-16 bg-gray-900 border border-gray-800 rounded px-1.5 py-0.5 text-center text-gray-200 text-xs" value="${cue.endSec.toFixed(2)}" data-idx="${idx}">
+              <span class="text-[10px] text-gray-500">ثانية</span>
+              <button class="delete-cue-btn text-red-400 hover:text-red-300 p-1 mr-1" data-idx="${idx}" title="حذف">🗑️</button>
+            </div>
+          </div>
+          <input type="text" class="cue-text-input w-full bg-gray-900 border border-gray-800 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-white focus:outline-none focus:border-orange-500" value="${cue.text}" data-idx="${idx}">
+        `;
+
+        captionsItemsContainer.appendChild(card);
+      });
+
+      // Bind edit events
+      captionsItemsContainer.querySelectorAll('.cue-text-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          appState.captions[idx].text = e.target.value;
+          updateOverlayCaption(studioVideoPlayer.currentTime);
+        });
+      });
+
+      captionsItemsContainer.querySelectorAll('.cue-start-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          appState.captions[idx].startSec = parseFloat(e.target.value) || 0;
+          updateOverlayCaption(studioVideoPlayer.currentTime);
+        });
+      });
+
+      captionsItemsContainer.querySelectorAll('.cue-end-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          appState.captions[idx].endSec = parseFloat(e.target.value) || 0;
+          updateOverlayCaption(studioVideoPlayer.currentTime);
+        });
+      });
+
+      captionsItemsContainer.querySelectorAll('.delete-cue-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(btn.dataset.idx, 10);
+          appState.captions.splice(idx, 1);
+          appState.captions.forEach((c, i) => c.id = i + 1);
+          renderCaptionsList();
+          updateOverlayCaption(studioVideoPlayer.currentTime);
+        });
+      });
+
+      captionsItemsContainer.querySelectorAll('.jump-to-cue-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const time = parseFloat(btn.dataset.time);
+          studioVideoPlayer.currentTime = time;
+          videoTimelineSlider.value = time;
+          updateOverlayCaption(time);
+        });
+      });
+    }
+
+    // Add new caption line at current video time
+    addNewCaptionLineBtn.addEventListener('click', () => {
+      const current = studioVideoPlayer.currentTime || 0;
+      const newCue = {
+        id: appState.captions.length + 1,
+        startSec: parseFloat(current.toFixed(2)),
+        endSec: parseFloat((current + 2.5).toFixed(2)),
+        text: 'اكتب الكابشن هنا...'
+      };
+      appState.captions.push(newCue);
+      appState.captions.sort((a, b) => a.startSec - b.startSec);
+      appState.captions.forEach((c, i) => c.id = i + 1);
+      renderCaptionsList();
+      showToast('تمت إضافة سطر جديد', '➕');
+    });
+
+    // Global Time Shift Buttons
+    document.querySelectorAll('.time-shift-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const shift = parseFloat(btn.dataset.shift);
+        appState.captions.forEach(c => {
+          c.startSec = Math.max(0, c.startSec + shift);
+          c.endSec = Math.max(0, c.endSec + shift);
+        });
+        renderCaptionsList();
+        updateOverlayCaption(studioVideoPlayer.currentTime);
+        showToast(`تم إزاحة الكابشن: ${shift > 0 ? '+' : ''}${shift} ثانية`, '⏱️');
+      });
+    });
+
+    // --- Tab 3: Podcast Trimmer List ---
+    function renderRawPodcastList() {
+      const query = searchPodcastText.value.trim().toLowerCase();
+      rawPodcastList.innerHTML = '';
+
+      appState.rawPodcastCues.forEach((cue, idx) => {
+        if (query && !cue.text.toLowerCase().includes(query)) return;
+
+        const item = document.createElement('div');
+        item.className = 'bg-gray-900 p-2.5 rounded-xl border border-gray-800 flex items-center justify-between gap-2';
+
+        item.innerHTML = `
+          <div>
+            <div class="text-[10px] font-mono text-gray-500" dir="ltr">${secondsToSrtTime(cue.startSec)}</div>
+            <p class="text-xs font-semibold text-gray-200">${cue.text}</p>
+          </div>
+          <button class="set-as-reel-start-btn text-xs bg-orange-500/20 text-orange-400 border border-orange-500/40 hover:bg-orange-500 hover:text-white px-2.5 py-1.5 rounded-lg font-bold transition flex-shrink-0" data-start="${cue.startSec}">
+            📌 اجعل هذا بداية الريل
+          </button>
+        `;
+
+        rawPodcastList.appendChild(item);
+      });
+
+      rawPodcastList.querySelectorAll('.set-as-reel-start-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const baseStart = parseFloat(btn.dataset.start);
+          // Filter cues starting from this one and shift
+          const shifted = appState.rawPodcastCues
+            .filter(c => c.endSec >= baseStart)
+            .map((c, i) => ({
+              id: i + 1,
+              startSec: Math.max(0, c.startSec - baseStart),
+              endSec: Math.max(0, c.endSec - baseStart),
+              text: c.text
+            }));
+
+          appState.captions = shifted;
+          renderCaptionsList();
+          switchTab('captions');
+          showToast('تم ضبط بداية الريل وتصفير التوقيت!', '🎉');
+        });
+      });
+    }
+
+    searchPodcastText.addEventListener('input', renderRawPodcastList);
+
+    // --- Tab Switching ---
+    function switchTab(name) {
+      tabBtnCaptions.className = 'flex-1 py-3 px-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition flex items-center justify-center gap-1.5';
+      tabBtnStyles.className = 'flex-1 py-3 px-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition flex items-center justify-center gap-1.5';
+      tabBtnPodcastTrim.className = 'flex-1 py-3 px-3 text-center border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition flex items-center justify-center gap-1.5';
+
+      tabPanelCaptions.classList.add('hidden');
+      tabPanelStyles.classList.add('hidden');
+      tabPanelPodcastTrim.classList.add('hidden');
+
+      if (name === 'captions') {
+        tabBtnCaptions.className = 'flex-1 py-3 px-3 text-center border-b-2 border-orange-500 text-orange-400 bg-gray-900/60 transition flex items-center justify-center gap-1.5';
+        tabPanelCaptions.classList.remove('hidden');
+      } else if (name === 'styles') {
+        tabBtnStyles.className = 'flex-1 py-3 px-3 text-center border-b-2 border-orange-500 text-orange-400 bg-gray-900/60 transition flex items-center justify-center gap-1.5';
+        tabPanelStyles.classList.remove('hidden');
+      } else if (name === 'podcast') {
+        tabBtnPodcastTrim.className = 'flex-1 py-3 px-3 text-center border-b-2 border-orange-500 text-orange-400 bg-gray-900/60 transition flex items-center justify-center gap-1.5';
+        tabPanelPodcastTrim.classList.remove('hidden');
+      }
+    }
+
+    tabBtnCaptions.addEventListener('click', () => switchTab('captions'));
+    tabBtnStyles.addEventListener('click', () => switchTab('styles'));
+    tabBtnPodcastTrim.addEventListener('click', () => switchTab('podcast'));
+
+    // --- Styling Engine ---
+    function updateOverlayStyles() {
+      captionOverlayText.style.fontFamily = `'${appState.fontFamily}', sans-serif`;
+      captionOverlayText.style.color = appState.textColor;
+      captionOverlayText.style.setProperty('--stroke-color', appState.strokeColor);
+      captionOverlayText.style.fontSize = `${appState.fontSize}px`;
+
+      if (appState.hasBackgroundBox) {
+        captionOverlayText.classList.add('bg-black/75', 'backdrop-blur-sm', 'px-4', 'py-1.5');
+      } else {
+        captionOverlayText.classList.remove('bg-black/75', 'backdrop-blur-sm', 'px-4', 'py-1.5');
+      }
+
+      // Position
+      captionOverlayWrapper.className = 'absolute inset-x-0 z-20 px-3 flex justify-center pointer-events-none transition-all';
+      if (appState.position === 'top') {
+        captionOverlayWrapper.classList.add('top-12');
+      } else if (appState.position === 'center') {
+        captionOverlayWrapper.classList.add('top-1/2', '-translate-y-1/2');
+      } else {
+        captionOverlayWrapper.classList.add('bottom-14');
+      }
+    }
+
+    // Font selection
+    document.querySelectorAll('.font-select-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.font-select-btn').forEach(b => {
+          b.classList.remove('border-2', 'border-orange-500', 'bg-orange-500/10', 'text-orange-300');
+          b.classList.add('border', 'border-gray-800', 'bg-gray-950', 'text-gray-300');
+        });
+        btn.classList.remove('border', 'border-gray-800', 'bg-gray-950', 'text-gray-300');
+        btn.classList.add('border-2', 'border-orange-500', 'bg-orange-500/10', 'text-orange-300');
+
+        appState.fontFamily = btn.dataset.font;
+        updateOverlayStyles();
+      });
+    });
+
+    // Preset color buttons
+    document.querySelectorAll('.color-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        appState.textColor = btn.dataset.color;
+        appState.strokeColor = btn.dataset.stroke;
+        textColorPicker.value = appState.textColor;
+        textColorHex.textContent = appState.textColor;
+        strokeColorPicker.value = appState.strokeColor;
+        strokeColorHex.textContent = appState.strokeColor;
+        updateOverlayStyles();
+      });
+    });
+
+    textColorPicker.addEventListener('input', (e) => {
+      appState.textColor = e.target.value;
+      textColorHex.textContent = appState.textColor;
+      updateOverlayStyles();
+    });
+
+    strokeColorPicker.addEventListener('input', (e) => {
+      appState.strokeColor = e.target.value;
+      strokeColorHex.textContent = appState.strokeColor;
+      updateOverlayStyles();
+    });
+
+    fontSizeSlider.addEventListener('input', (e) => {
+      appState.fontSize = parseInt(e.target.value, 10);
+      fontSizeDisplay.textContent = `${appState.fontSize}px`;
+      updateOverlayStyles();
+    });
+
+    bgBoxToggle.addEventListener('change', (e) => {
+      appState.hasBackgroundBox = e.target.checked;
+      updateOverlayStyles();
+    });
+
+    document.querySelectorAll('.position-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.position-btn').forEach(b => {
+          b.classList.remove('bg-orange-500', 'text-white', 'font-bold');
+          b.classList.add('text-gray-400');
+        });
+        btn.classList.remove('text-gray-400');
+        btn.classList.add('bg-orange-500', 'text-white', 'font-bold');
+
+        appState.position = btn.dataset.pos;
+        updateOverlayStyles();
+      });
+    });
+
+    // --- Video Player & Live Caption Overlay ---
+    function updateOverlayCaption(currentSec) {
+      currentTimeDisplay.textContent = formatTime(currentSec);
+
+      const activeCue = appState.captions.find(c => currentSec >= c.startSec && currentSec <= c.endSec);
+      if (activeCue) {
+        captionOverlayText.textContent = activeCue.text;
+        captionOverlayText.style.display = 'block';
+      } else {
+        captionOverlayText.textContent = '';
+        captionOverlayText.style.display = 'none';
+      }
+    }
+
+    studioVideoPlayer.addEventListener('timeupdate', () => {
+      if (!appState.isExporting) {
+        const cur = studioVideoPlayer.currentTime;
+        videoTimelineSlider.value = cur;
+        videoDurationText.textContent = `${formatTime(cur)} / ${formatTime(appState.videoDuration)}`;
+        updateOverlayCaption(cur);
+      }
+    });
+
+    videoTimelineSlider.addEventListener('input', (e) => {
+      const time = parseFloat(e.target.value);
+      studioVideoPlayer.currentTime = time;
+      updateOverlayCaption(time);
+    });
+
+    togglePlayBtn.addEventListener('click', () => {
+      if (studioVideoPlayer.paused) {
+        studioVideoPlayer.play();
+        playIconSvg.classList.add('hidden');
+        pauseIconSvg.classList.remove('hidden');
+      } else {
+        studioVideoPlayer.pause();
+        playIconSvg.classList.remove('hidden');
+        pauseIconSvg.classList.add('hidden');
+      }
+    });
+
+    jumpBackSecBtn.addEventListener('click', () => {
+      studioVideoPlayer.currentTime = Math.max(0, studioVideoPlayer.currentTime - 3);
+    });
+
+    jumpForwardSecBtn.addEventListener('click', () => {
+      studioVideoPlayer.currentTime = Math.min(appState.videoDuration, studioVideoPlayer.currentTime + 3);
+    });
+
+    // --- EXPORT VIDEO WITH BURNED-IN CAPTIONS (Canvas & MediaRecorder) ---
+    exportFinalVideoBtn.addEventListener('click', async () => {
+      if (!appState.videoFile && !studioVideoPlayer.src) {
+        showToast('يرجى اختيار فيديو الريل أولاً ليتم تصديره', '⚠️');
+        return;
+      }
+      if (appState.captions.length === 0) {
+        showToast('يرجى إدخال أو مراجعة الكابشن قبل التصدير', '⚠️');
+        return;
+      }
+
+      if (appState.isExporting) return;
+      appState.isExporting = true;
+
+      // Show Progress Bar
+      exportProgressBarContainer.classList.remove('hidden');
+      exportProgressBar.style.width = '0%';
+      exportPercentageText.textContent = '0%';
+      exportFinalVideoBtn.disabled = true;
+      exportFinalVideoBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      try {
+        studioVideoPlayer.pause();
+        studioVideoPlayer.currentTime = 0;
+
+        // Set up Canvas matching video aspect
+        const canvas = renderExportCanvas;
+        const video = studioVideoPlayer;
+        const vWidth = video.videoWidth || 1080;
+        const vHeight = video.videoHeight || 1920;
+        canvas.width = vWidth;
+        canvas.height = vHeight;
+        const ctx = canvas.getContext('2d');
+
+        // Capture stream from canvas & audio from video
+        const canvasStream = canvas.captureStream(30);
+
+        // Mix Audio
+        let combinedStream = canvasStream;
+        try {
+          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const sourceNode = audioCtx.createMediaElementSource(video);
+          const destNode = audioCtx.createMediaStreamDestination();
+          sourceNode.connect(destNode);
+          sourceNode.connect(audioCtx.destination);
+          
+          if (destNode.stream.getAudioTracks().length > 0) {
+            combinedStream = new MediaStream([
+              ...canvasStream.getVideoTracks(),
+              ...destNode.stream.getAudioTracks()
+            ]);
+          }
+        } catch (audioErr) {
+          console.warn('Audio capture fallback:', audioErr);
+        }
+
+        // Supported mimeType detection (MP4 for iPad Safari, WebM for Chrome)
+        let mimeType = 'video/mp4';
+        if (!MediaRecorder.isTypeSupported('video/mp4')) {
+          if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) {
+            mimeType = 'video/mp4;codecs=avc1';
+          } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+            mimeType = 'video/webm;codecs=vp9';
+          } else {
+            mimeType = 'video/webm';
+          }
+        }
+
+        const recorder = new MediaRecorder(combinedStream, { mimeType });
+        const recordedChunks = [];
+
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            recordedChunks.push(e.data);
+          }
+        };
+
+        recorder.onstop = () => {
+          const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+          const blob = new Blob(recordedChunks, { type: mimeType });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `reel_with_captions.${ext}`;
+          document.body.appendChild(a);
+          a.click();
+
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 1000);
+
+          appState.isExporting = false;
+          exportProgressBarContainer.classList.add('hidden');
+          exportFinalVideoBtn.disabled = false;
+          exportFinalVideoBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          showToast('🎉 تم تصدير وتحميل الفيديو بالكابشن بنجاح!', '🚀');
+        };
+
+        recorder.start();
+
+        // Render Frame Loop
+        video.currentTime = 0;
+        await video.play();
+
+        function drawFrame() {
+          if (!appState.isExporting) return;
+
+          // 1. Draw video frame
+          ctx.drawImage(video, 0, 0, vWidth, vHeight);
+
+          // 2. Determine active caption
+          const curTime = video.currentTime;
+          const cue = appState.captions.find(c => curTime >= c.startSec && curTime <= c.endSec);
+
+          if (cue && cue.text) {
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.direction = 'rtl';
+
+            // Scale font size proportionally to video resolution
+            const scaleFactor = vWidth / 400;
+            const computedFontSize = Math.round(appState.fontSize * scaleFactor);
+            ctx.font = `900 ${computedFontSize}px '${appState.fontFamily}', sans-serif`;
+
+            // Position Y
+            let posY = vHeight * 0.82; // bottom
+            if (appState.position === 'top') posY = vHeight * 0.16;
+            if (appState.position === 'center') posY = vHeight * 0.5;
+
+            const posX = vWidth / 2;
+            const text = cue.text;
+
+            // Optional background box
+            if (appState.hasBackgroundBox) {
+              const textMetrics = ctx.measureText(text);
+              const paddingX = computedFontSize * 0.6;
+              const paddingY = computedFontSize * 0.4;
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+              ctx.roundRect(
+                posX - (textMetrics.width / 2) - paddingX,
+                posY - (computedFontSize / 2) - paddingY,
+                textMetrics.width + (paddingX * 2),
+                computedFontSize + (paddingY * 2),
+                16
+              );
+              ctx.fill();
+            }
+
+            // Stroke / Outline
+            ctx.lineWidth = Math.max(4, Math.round(computedFontSize * 0.22));
+            ctx.strokeStyle = appState.strokeColor;
+            ctx.lineJoin = 'round';
+            ctx.strokeText(text, posX, posY);
+
+            // Fill Text
+            ctx.fillStyle = appState.textColor;
+            ctx.fillText(text, posX, posY);
+
+            ctx.restore();
+          }
+
+          // Progress
+          const progress = Math.min(100, Math.round((curTime / video.duration) * 100));
+          exportProgressBar.style.width = `${progress}%`;
+          exportPercentageText.textContent = `${progress}%`;
+
+          if (!video.paused && !video.ended) {
+            requestAnimationFrame(drawFrame);
+          } else if (video.ended) {
+            recorder.stop();
+          }
+        }
+
+        requestAnimationFrame(drawFrame);
+
+      } catch (err) {
+        console.error('Export error:', err);
+        showToast('حدث خطأ أثناء تصدير الفيديو: ' + err.message, '❌');
+        appState.isExporting = false;
+        exportProgressBarContainer.classList.add('hidden');
+        exportFinalVideoBtn.disabled = false;
+        exportFinalVideoBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    });
+
+    // --- Secondary Export: Clean SRT File ---
+    downloadShiftedSrtBtn.addEventListener('click', () => {
+      if (appState.captions.length === 0) {
+        showToast('لا توجد أسطر لتصديرها', '⚠️');
+        return;
+      }
+      const srt = appState.captions.map((c, i) => {
+        return `${i + 1}\n${secondsToSrtTime(c.startSec)} --> ${secondsToSrtTime(c.endSec)}\n${c.text}\n`;
+      }).join('\n');
+
+      const blob = new Blob([srt], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'reel_captions.srt';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 500);
+      showToast('تم تحميل ملف الـ SRT بنجاح!', '📄');
+    });
+
+    // Copy Captions Text
+    copyCaptionsTextBtn.addEventListener('click', () => {
+      if (appState.captions.length === 0) {
+        showToast('لا توجد نصوص للنسخ', '⚠️');
+        return;
+      }
+      const allText = appState.captions.map(c => c.text).join('\n');
+      navigator.clipboard.writeText(allText).then(() => {
+        showToast('تم نسخ نصوص الكابشن!', '📋');
+      });
+    });
+
+    // Toast helper
+    function showToast(msg, icon = '✅') {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').textContent = msg;
+      document.getElementById('toastIcon').textContent = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 2500);
+    }
+
+    // Initialize Styles
+    updateOverlayStyles();
+  </script>
+</body>
+</html>
